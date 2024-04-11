@@ -35,19 +35,20 @@ function movieTitles() {
       li.innerHTML = `
       <div>
       <h3 id="${movie.id}"class="movies">${movie.title}</h3>
-      <button>DELETE</button>
+      <button id="del">DELETE</button>
       </div>`
       ul.appendChild(li)
-    
+
+    li.querySelector('#del').addEventListener('click', () => {
+      li.innerHTML =''
+      delLi(`${movie.id}`)
+    })
     }))
 }
 movieTitles()
 
 function listMovies(films) {
   const list = document.getElementById("showing");
-  //const carrier = document.createElement("div")
-
-
   const views = document.querySelectorAll(".movies");
 views.forEach(details => {
   details.addEventListener("click", (event) => {
@@ -65,13 +66,28 @@ views.forEach(details => {
               </div>
             </div>
             <div class="extra content">
-              <button id="buy-ticket" class="ui orange button" onclick="redTickets(-1)">
+              <button id="buy-ticket" class="ui orange button">
                 Buy Ticket
               </button>
             </div>
    
-   `
-   //list.appendChild(carrier)
+   ` 
+   list.querySelector('#buy-ticket').addEventListener('click', () => { 
+    const num = document.getElementById('ticket-num')
+    const newNum = parseInt(num.innerHTML)
+    const red = -1
+    num.innerHTML = newNum
+    
+    if(newNum > 1){
+      num.innerHTML = newNum + red + 'remaining tickets'
+    }else{
+      num.textContent = 'Sold out'
+      
+    }
+    updTickets(film)
+
+  })
+ 
   })
 })
 
@@ -92,36 +108,30 @@ function viewMoviePoster(films){
  })
 }
 
-function redTickets(red){ 
-  const num = document.getElementById('ticket-num')
-  const gone = document.getElementById('buy-ticket')
-  const newNum = parseInt(num.innerHTML)
-  num.innerHTML = newNum
-  
-  if(newNum > 1){
-    num.innerHTML = newNum + red + 'remaining tickets'
-  }else{
-    num.textContent = 'Sold out'
-    gone.disabled = true
-
-  }
-
+function updTickets(film){
+  fetch(`https://code-server-msv5.onrender.com/films/${film.id}`,{
+    method:"PATCH",
+    headers:{
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(film)
+  })
+  .then(res => res.json)
+  .then(films => films)
+}
+function deleted(id){
+  fetch(`https://code-server-msv5.onrender.com/films/${id}`,{
+    method:"DELETE",
+    headers:{
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.json())
+  .then(films => films)
 }
 
 
-// const btn = document.getElementById('buy-ticket')
 
-//       btn.addEventListener('click', function(event){
-//           let remTickets = parseInt(document.querySelector('#ticket-num').textContent,10)
-//           event.preventDefault()
-//           if(remTickets > 0){
-//               document.querySelector('#ticket-num').textContent  = remTickets-1
-              
-//           }
-//           else if(parseInt(remTickets, 10)===0){
-//               btn.textContent = 'Sold Out'
-//           }
-//   })
 
 
 
