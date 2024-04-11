@@ -41,7 +41,7 @@ function movieTitles() {
 
     li.querySelector('#del').addEventListener('click', () => {
       li.innerHTML =''
-      delLi(`${movie.id}`)
+      deleted(`${movie.id}`)
     })
     }))
 }
@@ -84,7 +84,7 @@ views.forEach(details => {
       num.textContent = 'Sold out'
       
     }
-    updTickets(film)
+    updTickets(films)
 
   })
  
@@ -108,13 +108,13 @@ function viewMoviePoster(films){
  })
 }
 
-function updTickets(film){
-  fetch(`https://code-server-msv5.onrender.com/films/${film.id}`,{
+function updTickets(films){
+  fetch(`https://code-server-msv5.onrender.com/films/${films.id}`,{
     method:"PATCH",
     headers:{
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(film)
+    body: JSON.stringify(films)
   })
   .then(res => res.json)
   .then(films => films)
@@ -129,6 +129,19 @@ function deleted(id){
   .then(res => res.json())
   .then(films => films)
 }
+
+
+
+
+
+
+
+
+
+
+
+        
+
 
 
 
