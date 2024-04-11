@@ -2,7 +2,7 @@
 // declaring var
 
 
-let films = "http://localhost:3000/films"
+let films = "https://code-server-msv5.onrender.com/films"
 document.addEventListener('DOMContentLoaded', async(event)=>{
     const films = await getAllMovies()
      viewMoviePoster(films)
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async(event)=>{
    
 
 function getAllMovies() {
-    return fetch("http://localhost:3000/films",{
+    return fetch("https://code-server-msv5.onrender.com/films",{
         method:"GET",
         headers:{
             "Content-Type": "application/json",
@@ -28,25 +28,27 @@ function getAllMovies() {
 
 function movieTitles() {
   const ul = document.getElementById("films")
-    return fetch("http://localhost:3000/films")
+    return fetch("https://code-server-msv5.onrender.com/films")
     .then(res => res.json())
     .then(title => title.map(movie => {
       let li = document.createElement("li");
       li.innerHTML = `
       <div>
       <h3 id="${movie.id}"class="movies">${movie.title}</h3>
+      <button id="del">DELETE</button>
       </div>`
       ul.appendChild(li)
 
+    li.querySelector('#del').addEventListener('click', () => {
+      li.innerHTML =''
+      delLi(`${movie.id}`)
+    })
     }))
 }
 movieTitles()
 
 function listMovies(films) {
   const list = document.getElementById("showing");
-  //const carrier = document.createElement("div")
-
-
   const views = document.querySelectorAll(".movies");
 views.forEach(details => {
   details.addEventListener("click", (event) => {
@@ -60,7 +62,7 @@ views.forEach(details => {
               <div class="description">
                 <div id="film-info">${disDetails.description}</div>
                 <span id="showtime" class="ui label">${disDetails.showtime}</span>
-                <span id="ticket-num">${disDetails.capacity-disDetails.tickets_sold}</span> remaining tickets
+                <span id="ticket-num">${disDetails.capacity-disDetails.tickets_sold}remaining tickets</span>
               </div>
             </div>
             <div class="extra content">
@@ -69,8 +71,23 @@ views.forEach(details => {
               </button>
             </div>
    
-   `
-   //list.appendChild(carrier)
+   ` 
+   list.querySelector('#buy-ticket').addEventListener('click', () => { 
+    const num = document.getElementById('ticket-num')
+    const newNum = parseInt(num.innerHTML)
+    const red = -1
+    num.innerHTML = newNum
+    
+    if(newNum > 1){
+      num.innerHTML = newNum + red + 'remaining tickets'
+    }else{
+      num.textContent = 'Sold out'
+      
+    }
+    updTickets(film)
+
+  })
+ 
   })
 })
 
@@ -91,21 +108,27 @@ function viewMoviePoster(films){
  })
 }
 
-
-const btn = document.getElementById('buy-ticket')
-
-      btn.addEventListener('click', function(event){
-          let remTickets = document.querySelector('#ticket-num').textContent
-          event.preventDefault()
-          if(remTickets > 0){
-              document.querySelector('#ticket-num').textContent  = remTickets-1
-              
-          }
-          else if(parseInt(remTickets, 10)===0){
-              btn.textContent = 'Sold Out'
-          }
+function updTickets(film){
+  fetch(`https://code-server-msv5.onrender.com/films/${film.id}`,{
+    method:"PATCH",
+    headers:{
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(film)
   })
-
+  .then(res => res.json)
+  .then(films => films)
+}
+function deleted(id){
+  fetch(`https://code-server-msv5.onrender.com/films/${id}`,{
+    method:"DELETE",
+    headers:{
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.json())
+  .then(films => films)
+}
 
 
 
